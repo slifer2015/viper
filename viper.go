@@ -941,7 +941,7 @@ func (v *Viper) find(lcaseKey string) interface{} {
 			return nil
 		}
 	}
-	envkey, exists := v.env[lcaseKey]
+	envkey, exists := v.env[strings.Replace(lcaseKey, ".", "_", -1)]
 	if exists {
 		if val = v.getEnv(envkey); val != "" {
 			return val
@@ -1759,6 +1759,14 @@ func (v *Viper) findConfigFile() (string, error) {
 		}
 	}
 	return "", ConfigFileNotFoundError{v.configName, fmt.Sprintf("%s", v.configPaths)}
+}
+
+// SetDefaultBind set default and also bind
+func SetDefaultBind(key string, value interface{}) {
+	SetDefault(key, value)
+	keyArr := strings.Split(key, ".")
+	resKey := strings.Join(keyArr, "_")
+	BindEnv(resKey)
 }
 
 // Debug prints all configuration registries for debugging
